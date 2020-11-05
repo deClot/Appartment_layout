@@ -1,0 +1,25 @@
+{"root_path": "/home/refenement/Projects/Dataset_flats/new/all/wo_bedrooms/",
+ "batch_size": 1,
+ "add_input": true,
+
+ "n_epochs": 100,
+ "lambda_feat": 10,
+
+ "type_G": "global",
+
+ "n_layers": 3,
+
+ "use_dropout": true,
+
+ "lr": 0.0002,
+ "beta1": 0.5,
+
+ "verbose": 10,
+ "to_neptune": true,
+ "name": "pix2pixhd",
+
+ "params_loss": {
+     "no_vgg_loss": false,
+     "no_ganFeat_loss": false
+ }
+}

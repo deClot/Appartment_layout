@@ -1,0 +1,26 @@
+{"root_path": "/home/refenement/Projects/Dataset_flats/new/all/wo_bedrooms/",
+ "batch_size": 1,
+ "add_input": true,
+
+ "n_epochs": 100,
+ "lambda_l1": 10,
+
+ "type_G": 'global',
+
+ "net_D": "n_layers",
+ "n_layers": 2,
+
+ "use_dropout": true,
+
+ "lr": 0.0002,
+ "beta1": 0.5,
+ 
+
+ netD='basic', n_layers_D=3,
+ "to_neptune": true,
+ "name": "with rotat, wo filling vent, use dropout",
+ "params_loss": {
+     "no_vgg_loss": false,
+     "no_ganFeat_loss": false,
+ }
+}
