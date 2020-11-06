@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import torch.nn as nn
+from torch.autograd import Variable
 
 from scripts.models import ResnetBlock
 
@@ -263,7 +264,6 @@ class NLayerDiscriminator(nn.Module):
             return self.model(input)
 
 
-
 class GANLoss(nn.Module):
     def __init__(self, use_lsgan=True, target_real_label=1.0,
                  target_fake_label=0.0, tensor=torch.FloatTensor):
@@ -304,6 +304,6 @@ class GANLoss(nn.Module):
                 target_tensor = self.get_target_tensor(pred, target_is_real)
                 loss += self.loss(pred, target_tensor)
             return loss
-        else:            
+        else:
             target_tensor = self.get_target_tensor(input[-1], target_is_real)
             return self.loss(input[-1], target_tensor)

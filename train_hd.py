@@ -49,7 +49,7 @@ def make_forward(data, net_g, net_d, criterions, params_loss, to_neptune,
     loss_d_fake = criterionGAN(pred_fake, False)
 
     # forward D with real
-    real_ab = torch.cat((real_a, labels, real_b.detach()), 1)
+    real_ab = torch.cat((real_a, labels, real_b), 1)
     pred_real = net_d.forward(real_ab)
     loss_d_real = criterionGAN(pred_real, True)
 
@@ -81,8 +81,10 @@ def make_forward(data, net_g, net_d, criterions, params_loss, to_neptune,
     if to_neptune:
         neptune.log_metric('g', loss_G.data.cpu().numpy())
         neptune.log_metric('g_gan', loss_G_GAN.data.cpu().numpy())
-        neptune.log_metric('g_gan_feat', loss_G_Feat)
-        neptune.log_metric('g_vgg', loss_G_VGG.data.cpu().numpy())
+        if not params_loss['no_ganFeat_loss']:
+            neptune.log_metric('g_gan_feat', loss_G_Feat)
+        if not params_loss['no_vgg_loss']:
+            neptune.log_metric('g_vgg', loss_G_VGG.data.cpu().numpy())
         neptune.log_metric('d', loss_D.data.cpu().numpy())
         neptune.log_metric('d0', loss_d_fake.data.cpu().numpy())
         neptune.log_metric('d1', loss_d_real.data.cpu().numpy())
@@ -90,7 +92,7 @@ def make_forward(data, net_g, net_d, criterions, params_loss, to_neptune,
     return loss_return
 
 
-def train(datas, params_loss, n_epochs=200, lr=.0002, beta1=.5, lambda_feat=10,
+def train(datas, params_loss, batch_size, n_epochs=200, lr=.0002, beta1=.5, lambda_feat=10,
           type_G='global', n_downsample_global=3, n_blocks_global=9,
           n_layers_D=3, num_D=3, getIntermFeat=False,
           device=None, verbose=2, name='', to_neptune=True):
@@ -111,14 +113,14 @@ def train(datas, params_loss, n_epochs=200, lr=.0002, beta1=.5, lambda_feat=10,
                                                      'n_epochs': n_epochs,
                                                      # 'd_patches': patches
                                                      },
-                                  upload_source_files=['train.py',
+                                  upload_source_files=['train_hd.py',
                                                        'params_hd.json',
                                                        'scripts/'])
 
     criterionGAN = GANLoss_hd()
     criterionFeat = torch.nn.L1Loss()
-    if not params_loss['no_vgg_loss']:
-        criterionVGG = VGGLoss(device)
+    # if not params_loss['no_vgg_loss']:
+    criterionVGG = VGGLoss(device)
 
     # # setup optimizer
     optimizer_G = optim.Adam(net_g.parameters(), lr=lr,
@@ -179,7 +181,7 @@ if __name__ == '__main__':
     neptune.init('declot/alpix2pix')
 
     opt = get_options_from_json(hd=True)
-    df = pd.read_csv('/home/refenement/Projects/Dataset_flats/flats_info_ini.csv')
+    df = pd.read_csv('/home/refenement/Projects/Dataset_flats/flats_info.csv')
     df_ini = pd.read_csv('/home/refenement/Projects/Dataset_flats/flats_info_ini.csv')
 
     df_prep, ss, ohe = preprocess_appartment_data(df)
@@ -205,7 +207,7 @@ if __name__ == '__main__':
     device = [torch.device("cuda:0")]
 
     train((training_data_loader, testing_data_loader, testing_data_loader_bs1),
-          opt['params_loss'], n_epochs=opt['n_epochs'],
+          opt['params_loss'], opt['batch_size'], n_epochs=opt['n_epochs'],
           lambda_feat=opt['lambda_feat'],
           type_G=opt['type_G'],
           verbose=opt['verbose'], name=opt['name'], device=device,

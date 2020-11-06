@@ -2,7 +2,7 @@
  "batch_size": 1,
  "add_input": true,
 
- "n_epochs": 100,
+ "n_epochs": 150,
  "lambda_feat": 10,
 
  "type_G": "global",
@@ -19,7 +19,7 @@
  "name": "pix2pixhd",
 
  "params_loss": {
-     "no_vgg_loss": false,
+     "no_vgg_loss": true,
      "no_ganFeat_loss": false
  }
 }
